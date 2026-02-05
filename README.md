@@ -5,6 +5,32 @@ Transform unstructured documents into searchable knowledge with just a few click
 
 ---
 
+## The Data: arXiv Research Papers
+
+This lab uses **[arXiv.org](https://arxiv.org)** as its data source—a free, open-access repository of over 2.4 million scholarly articles in physics, mathematics, computer science, and more.
+
+### Why arXiv?
+- **Free & Public** - No API keys, no authentication, no cost
+- **Real Documents** - Actual research papers (PDFs) with rich metadata
+- **Perfect for RAG** - Dense, technical content ideal for demonstrating AI search capabilities
+
+### What We Pull
+The `load_arxiv_papers()` procedure fetches papers via the [arXiv API](https://info.arxiv.org/help/api/index.html):
+
+| Field | Description |
+|-------|-------------|
+| `paper_id` | Unique arXiv identifier (e.g., `2401.12345`) |
+| `title` | Full paper title |
+| `authors` | List of all authors |
+| `abstract` | Paper summary/abstract |
+| `categories` | Subject classifications (e.g., `cs.CL`, `cs.AI`) |
+| `published_date` | Original submission date |
+| `PDF file` | Full paper downloaded to Snowflake stage |
+
+You can search any topic and category—the default examples use **RAG (Retrieval-Augmented Generation)** papers from the **cs.CL (Computation and Language)** category.
+
+---
+
 ## What You'll Build
 
 This lab demonstrates three powerful Snowflake capabilities working together:
