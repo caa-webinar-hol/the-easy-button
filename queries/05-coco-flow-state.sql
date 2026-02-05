@@ -39,41 +39,50 @@ DESCRIBE TABLE ARXIV_PAPERS_METADATA;
 
 -- -----------------------------------------------------------------------------
 -- STEP 4: Test AI_PARSE_DOCUMENT on sample PDFs
+-- These are the 3 papers loaded by: CALL load_arxiv_papers('RAG', 'cs.CL', 3)
 -- -----------------------------------------------------------------------------
--- Parse first sample PDF
+-- Parse first sample PDF (Biomedical Retrieval paper)
 SELECT 
-    '2602.03731_2026-02-03_Astrino_cs.CL.pdf' AS filename,
+    '2602.04731_2026-02-04_Khattab_Corbeil_Kora_etal_cs.CL.pdf' AS filename,
     AI_PARSE_DOCUMENT(
-        TO_FILE('@POC.EASY_BUTTON_HOL.ARXIV_PAPERS_STAGE', '2602.03731_2026-02-03_Astrino_cs.CL.pdf'),
+        TO_FILE('@POC.EASY_BUTTON_HOL.ARXIV_PAPERS_STAGE', '2602.04731_2026-02-04_Khattab_Corbeil_Kora_etal_cs.CL.pdf'),
         {'mode': 'LAYOUT'}
     ) AS parsed_content;
 
--- Parse second sample PDF
+-- Parse second sample PDF (LinGO Framework paper)
 SELECT 
-    '2602.03689_2026-02-03_Sun_Jiang_Wang_etal_cs.CL.pdf' AS filename,
+    '2602.04693_2026-02-04_Zhang_Bertaglia_cs.CL.pdf' AS filename,
     AI_PARSE_DOCUMENT(
-        TO_FILE('@POC.EASY_BUTTON_HOL.ARXIV_PAPERS_STAGE', '2602.03689_2026-02-03_Sun_Jiang_Wang_etal_cs.CL.pdf'),
+        TO_FILE('@POC.EASY_BUTTON_HOL.ARXIV_PAPERS_STAGE', '2602.04693_2026-02-04_Zhang_Bertaglia_cs.CL.pdf'),
+        {'mode': 'LAYOUT'}
+    ) AS parsed_content;
+
+-- Parse third sample PDF (Information Retrieval paper)
+SELECT 
+    '2602.04579_2026-02-04_Khattab_Bauer_Heine_etal_cs.IR.pdf' AS filename,
+    AI_PARSE_DOCUMENT(
+        TO_FILE('@POC.EASY_BUTTON_HOL.ARXIV_PAPERS_STAGE', '2602.04579_2026-02-04_Khattab_Bauer_Heine_etal_cs.IR.pdf'),
         {'mode': 'LAYOUT'}
     ) AS parsed_content;
 
 -- Check parsed document structure
 SELECT 
     OBJECT_KEYS(AI_PARSE_DOCUMENT(
-        TO_FILE('@POC.EASY_BUTTON_HOL.ARXIV_PAPERS_STAGE', '2602.03731_2026-02-03_Astrino_cs.CL.pdf'),
+        TO_FILE('@POC.EASY_BUTTON_HOL.ARXIV_PAPERS_STAGE', '2602.04731_2026-02-04_Khattab_Corbeil_Kora_etal_cs.CL.pdf'),
         {'mode': 'LAYOUT'}
     )) AS parsed_keys;
 
 -- Check content length
 SELECT 
     LENGTH(AI_PARSE_DOCUMENT(
-        TO_FILE('@POC.EASY_BUTTON_HOL.ARXIV_PAPERS_STAGE', '2602.03731_2026-02-03_Astrino_cs.CL.pdf'),
+        TO_FILE('@POC.EASY_BUTTON_HOL.ARXIV_PAPERS_STAGE', '2602.04731_2026-02-04_Khattab_Corbeil_Kora_etal_cs.CL.pdf'),
         {'mode': 'LAYOUT'}
     ):content::STRING) AS content_length;
 
 -- Check metadata (page count)
 SELECT 
     AI_PARSE_DOCUMENT(
-        TO_FILE('@POC.EASY_BUTTON_HOL.ARXIV_PAPERS_STAGE', '2602.03731_2026-02-03_Astrino_cs.CL.pdf'),
+        TO_FILE('@POC.EASY_BUTTON_HOL.ARXIV_PAPERS_STAGE', '2602.04731_2026-02-04_Khattab_Corbeil_Kora_etal_cs.CL.pdf'),
         {'mode': 'LAYOUT'}
     ):metadata AS parsed_metadata;
 
@@ -199,7 +208,7 @@ DESCRIBE AGENT POC.EASY_BUTTON_HOL.ARXIV_RESEARCH_AGENT;
 -- SUMMARY
 -- -----------------------------------------------------------------------------
 -- Objects created:
---   1. TABLE: POC.EASY_BUTTON_HOL.ARXIV_PAPERS_PARSED (5 papers with full text)
+--   1. TABLE: POC.EASY_BUTTON_HOL.ARXIV_PAPERS_PARSED (3 papers with full text)
 --   2. CORTEX SEARCH SERVICE: POC.EASY_BUTTON_HOL.ARXIV_PAPERS_SEARCH_SERVICE
 --   3. AGENT: POC.EASY_BUTTON_HOL.ARXIV_RESEARCH_AGENT
 --
@@ -210,3 +219,10 @@ DESCRIBE AGENT POC.EASY_BUTTON_HOL.ARXIV_RESEARCH_AGENT;
 --     - "What papers discuss GraphRAG?"
 --     - "Tell me about RAG systems for Turkish language"
 -- =============================================================================
+
+-- -----------------------------------------------------------------------------
+-- CLEANUP: Drop created objects before re-running (preserves stage & metadata)
+-- -----------------------------------------------------------------------------
+DROP AGENT IF EXISTS POC.EASY_BUTTON_HOL.ARXIV_RESEARCH_AGENT;
+DROP CORTEX SEARCH SERVICE IF EXISTS POC.EASY_BUTTON_HOL.ARXIV_PAPERS_SEARCH_SERVICE;
+DROP TABLE IF EXISTS POC.EASY_BUTTON_HOL.ARXIV_PAPERS_PARSED;
